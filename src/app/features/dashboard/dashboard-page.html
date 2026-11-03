@@ -1,0 +1,206 @@
+@if (state() === 'loading') {
+  <section class="loading" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Carregando dados da vila...</p>
+  </section>
+}
+
+@if (state() === 'error') {
+  <section class="error-panel" role="alert">
+    <h2>Backend indisponível</h2>
+    <p>{{ errorMessage() }}</p>
+    <p class="hint">
+      Inicie a API local (porta 8080) e tente novamente. Nenhum dado é inventado quando a API
+      está offline.
+    </p>
+    <button type="button" (click)="load()">Tentar novamente</button>
+  </section>
+}
+
+@if (state() === 'ready' && dashboard(); as data) {
+  <!-- Village header -->
+  <section class="village-header">
+    <div class="village-identity">
+      <span class="th-badge" aria-hidden="true">TH{{ data.village.townHallLevel }}</span>
+      <div>
+        <p class="eyebrow">Vila principal · Snapshot histórico {{ data.village.snapshotDate }}</p>
+        <h1>{{ data.village.playerName }} <span class="tag">{{ data.village.playerTag }}</span></h1>
+        <p class="intro">
+          Progressão acumulada desde o início do jogo. A métrica conta etapas catalogadas
+          (níveis permanentes + Sobrecargas), não é a porcentagem oficial da Supercell.
+        </p>
+      </div>
+    </div>
+    <div class="gold-pass" [class.active]="data.village.goldPassBoost > 0">
+      <span>Passe Dourado</span>
+      <strong>{{ data.village.goldPassBoost * 100 | number: '1.0-0' }}%</strong>
+    </div>
+  </section>
+
+  <!-- Headline progress -->
+  <section class="progress-hero">
+    <div class="donut" [attr.style]="donutStyle()">
+      <div class="donut-center">
+        <strong>{{ data.progress.overallProgressPercent | number: '1.0-1' }}%</strong>
+        <span>Progresso geral</span>
+      </div>
+    </div>
+    <div class="progress-breakdown">
+      <div class="bar-row">
+        <span class="bar-label">Níveis permanentes</span>
+        <div class="bar"><div class="fill permanent" [style.width.%]="data.progress.permanentProgressPercent"></div></div>
+        <span class="bar-value">{{ data.progress.permanentProgressPercent | number: '1.0-1' }}%</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Sobrecargas</span>
+        <div class="bar"><div class="fill supercharge" [style.width.%]="data.progress.superchargeProgressPercent"></div></div>
+        <span class="bar-value">{{ data.progress.superchargeProgressPercent | number: '1.0-1' }}%</span>
+      </div>
+      <p class="full-status" [class.certified]="data.progress.fullCertified">
+        {{ data.progress.fullCertificationMessage }}
+      </p>
+    </div>
+  </section>
+
+  <!-- KPI cards -->
+  <section class="cards" aria-label="Indicadores principais">
+    <article>
+      <span>Etapas restantes</span>
+      <strong>{{ data.progress.overallRemainingSteps | number }}</strong>
+      <p>de {{ data.progress.overallTotalSteps | number }} etapas catalogadas</p>
+    </article>
+    <article>
+      <span>Construtores</span>
+      <strong>{{ data.builders.permanentBuilderCapacity }}</strong>
+      <p>permanentes @if (data.builders.goblinBuilderTemporary) { · Goblin temporário }</p>
+    </article>
+    <article>
+      <span>Dias-construtor conhecidos</span>
+      <strong>{{ data.durations.scenarioKnownBuilderDays | number: '1.0-1' }}</strong>
+      <p>limite inferior: ~{{ data.builders.estimatedBuilderCalendarDaysLowerBound | number: '1.0-1' }} dias de calendário</p>
+    </article>
+    <article [class.warn]="!data.durations.exactTotalAvailable">
+      <span>Cobertura dos dados</span>
+      <strong>{{ data.dataQuality.coveragePercent | number: '1.0-1' }}%</strong>
+      <p>{{ data.dataQuality.unknownUpgradeStepCount }} etapas com duração desconhecida</p>
+    </article>
+  </section>
+
+  <!-- Category progress -->
+  <section class="categories-panel">
+    <header><h2>Progresso por categoria</h2></header>
+    <div class="category-grid">
+      @for (category of data.categories; track category.category) {
+        <button
+          type="button"
+          class="category-chip"
+          [class.selected]="selectedCategory() === category.category"
+          (click)="selectCategory(category.category)">
+          <span class="chip-name">{{ category.category }}</span>
+          <div class="bar"><div class="fill category" [style.width.%]="category.progressPercent"></div></div>
+          <span class="chip-value">{{ category.progressPercent | number: '1.0-0' }}%</span>
+          @if (category.unknownEntityCount > 0) {
+            <span class="chip-warn">{{ category.unknownEntityCount }} item(ns) sem dados</span>
+          }
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- Selected category entities -->
+  @if (selectedCategory(); as selected) {
+    <section class="entity-table">
+      <header><h2>{{ selected }}</h2></header>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th><th>Qtd</th><th>Nível</th><th>Máx</th><th>No máx</th>
+            <th>Sobrecarga</th><th>Confiança</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entity of activeCategoryEntities(); track entity.entityKey) {
+            <tr>
+              <td class="item-name">{{ entity.name }}</td>
+              <td>{{ entity.quantity }}</td>
+              <td>{{ entity.currentLevel ?? '—' }}</td>
+              <td>{{ entity.maxLevel ?? '—' }}</td>
+              <td>{{ entity.countAtMax }}/{{ entity.quantity }}</td>
+              <td>
+                @if (entity.maxSupercharge && entity.maxSupercharge > 0) {
+                  SC {{ (entity.sc1Completed ?? 0) + (entity.sc2Completed ?? 0) + (entity.sc3Completed ?? 0) }}
+                  / {{ entity.maxSupercharge * entity.quantity }}
+                } @else { — }
+              </td>
+              <td><span class="confidence">{{ entity.confidence }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+
+  <!-- Supercharges -->
+  <section class="upgrades-panel">
+    <header>
+      <h2>Sobrecargas pendentes</h2>
+      <span class="count">{{ supercharges().length }} etapas</span>
+    </header>
+    <div class="upgrade-list">
+      @for (row of supercharges(); track row.category + row.item + row.stage) {
+        <div class="upgrade-row supercharge-row" [class.in-progress]="row.activeCount > 0">
+          <div class="upgrade-main">
+            <strong>{{ row.item }}</strong>
+            <span class="stage">{{ row.stage }}</span>
+          </div>
+          <div class="upgrade-meta">
+            <span>{{ row.count }}× pendente</span>
+            @if (row.activeCount > 0) { <span class="badge">{{ row.activeCount }} em andamento</span> }
+            <span class="duration" [class.unknown]="!row.durationKnown">
+              {{ row.durationKnown ? formatDays(row.discountedDurationDaysPerUnit) + ' / un.' : 'duração desconhecida' }}
+            </span>
+          </div>
+        </div>
+      } @empty {
+        <p class="empty">Nenhuma Sobrecarga pendente catalogada.</p>
+      }
+    </div>
+  </section>
+
+  <!-- Permanent upgrades -->
+  <section class="upgrades-panel">
+    <header>
+      <h2>Melhorias permanentes pendentes</h2>
+      <span class="count">{{ permanentUpgrades().length }} etapas</span>
+    </header>
+    <div class="upgrade-list">
+      @for (row of permanentUpgrades(); track row.category + row.item + row.fromLevel) {
+        <div class="upgrade-row" [class.in-progress]="row.activeCount > 0">
+          <div class="upgrade-main">
+            <strong>{{ row.item }}</strong>
+            <span class="stage">{{ row.fromLevel }} → {{ row.toLevel }}</span>
+            <span class="pill">{{ row.category }}</span>
+          </div>
+          <div class="upgrade-meta">
+            <span>{{ row.count }}× · {{ row.queue }}</span>
+            @if (row.activeCount > 0) { <span class="badge">{{ row.activeCount }} em andamento</span> }
+            <span class="duration" [class.unknown]="!row.durationKnown">
+              {{ row.durationKnown ? formatDays(row.discountedDurationDaysPerUnit) + ' / un.' : 'duração desconhecida' }}
+            </span>
+          </div>
+        </div>
+      } @empty {
+        <p class="empty">Nenhuma melhoria permanente pendente catalogada.</p>
+      }
+    </div>
+  </section>
+
+  <footer class="data-note">
+    <p>
+      Status da análise: <strong>{{ data.status }}</strong>. Fonte: snapshot histórico de
+      {{ data.village.snapshotDate }} (não é consulta em tempo real). Itens potencialmente ausentes:
+      {{ data.dataQuality.potentiallyMissingEntityCount }}. Avisos de validação:
+      {{ data.dataQuality.validationIssueCount }}.
+    </p>
+  </footer>
+}
