@@ -195,6 +195,48 @@
     </div>
   </section>
 
+  <!-- Official Supercell API profile (collected via fetch-player) -->
+  @if (officialProfile(); as official) {
+    <section class="official-panel">
+      <header>
+        <h2>Perfil oficial (API Supercell)</h2>
+        @if (official.available) {
+          <span class="badge-ok">Coleta disponível</span>
+        } @else {
+          <span class="badge-off">Sem coleta</span>
+        }
+      </header>
+
+      @if (official.available && official.profile; as player) {
+        <div class="official-grid">
+          <div class="official-id">
+            <strong>{{ player.name }}</strong>
+            <span class="tag">{{ player.tag }}</span>
+            <span class="meta">TH{{ player.townHallLevel }} · XP {{ player.expLevel }}</span>
+            <span class="meta">Coletado em {{ official.collectedAt }} · HTTP {{ official.httpStatus }}</span>
+          </div>
+          <div class="official-counts">
+            <span><strong>{{ player.heroCount }}</strong> heróis</span>
+            <span><strong>{{ player.troopCount }}</strong> tropas</span>
+            <span><strong>{{ player.spellCount }}</strong> feitiços</span>
+            <span><strong>{{ player.heroEquipmentCount }}</strong> equipamentos</span>
+          </div>
+        </div>
+        <p class="official-note">
+          A API pública traz apenas estes campos (heróis, tropas, feitiços, equipamentos). Ela não
+          expõe construções, Sobrecargas, filas nem cronômetros — por isso o progresso da vila
+          continua vindo do snapshot histórico, não desta coleta.
+        </p>
+      } @else {
+        <p class="official-empty">{{ official.message }}</p>
+        <p class="official-note">
+          Rode no backend: <code>fetch-player --tag "#U8J89QP2"</code> com o
+          <code>CLASH_API_TOKEN</code> no ambiente, e recarregue o dashboard.
+        </p>
+      }
+    </section>
+  }
+
   <footer class="data-note">
     <p>
       Status da análise: <strong>{{ data.status }}</strong>. Fonte: snapshot histórico de

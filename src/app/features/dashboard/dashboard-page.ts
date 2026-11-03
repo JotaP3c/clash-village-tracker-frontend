@@ -1,10 +1,12 @@
 import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { DashboardApiService } from '../../core/api/dashboard-api.service';
 import {
   CategoryResponse,
   DashboardResponse,
+  OfficialProfileResponse,
   UpgradeResponse,
   UpgradeRow
 } from '../../core/api/dashboard.models';
@@ -25,6 +27,7 @@ export class DashboardPage implements OnInit {
   protected readonly dashboard = signal<DashboardResponse | null>(null);
   protected readonly categories = signal<CategoryResponse | null>(null);
   protected readonly upgrades = signal<UpgradeResponse | null>(null);
+  protected readonly officialProfile = signal<OfficialProfileResponse | null>(null);
   protected readonly selectedCategory = signal<string | null>(null);
 
   protected readonly baseUrl = this.api.baseUrl;
@@ -59,12 +62,15 @@ export class DashboardPage implements OnInit {
     forkJoin({
       dashboard: this.api.dashboard(),
       categories: this.api.categories(),
-      upgrades: this.api.upgrades()
+      upgrades: this.api.upgrades(),
+      // The official profile is optional context; a failure here must not break the dashboard.
+      officialProfile: this.api.officialProfile().pipe(catchError(() => of(null)))
     }).subscribe({
-      next: ({ dashboard, categories, upgrades }) => {
+      next: ({ dashboard, categories, upgrades, officialProfile }) => {
         this.dashboard.set(dashboard);
         this.categories.set(categories);
         this.upgrades.set(upgrades);
+        this.officialProfile.set(officialProfile);
         if (categories.categories.length > 0) {
           this.selectedCategory.set(categories.categories[0].category);
         }

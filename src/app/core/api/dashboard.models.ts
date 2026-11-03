@@ -142,6 +142,30 @@ export interface HealthResponse {
   time: string;
 }
 
+export interface OfficialProfilePlayer {
+  tag: string;
+  name: string;
+  townHallLevel: number | null;
+  expLevel: number | null;
+  troopCount: number;
+  spellCount: number;
+  heroCount: number;
+  heroEquipmentCount: number;
+}
+
+export interface OfficialProfileResponse {
+  available: boolean;
+  message: string;
+  collectionId: string | null;
+  requestedTag: string | null;
+  returnedTag: string | null;
+  httpStatus: number | null;
+  outcome: string | null;
+  collectedAt: string | null;
+  bodySha256: string | null;
+  profile: OfficialProfilePlayer | null;
+}
+
 export interface SnapshotResponse {
   playerTag: string;
   playerName: string;

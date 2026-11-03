@@ -96,6 +96,24 @@ td.item-name { font-weight: 600; }
 .duration.unknown { color: #b45309; font-style: italic; }
 .empty { color: var(--muted); font-style: italic; }
 
+/* ---------- official profile ---------- */
+.official-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 1.1rem; margin-top: 1.5rem; padding: 1.5rem; }
+.official-panel header { align-items: center; display: flex; gap: 0.8rem; justify-content: space-between; margin-bottom: 1rem; }
+.official-panel h2 { font-size: 1.1rem; margin: 0; }
+.badge-ok { background: #f0fdf4; border: 1px solid #16a34a; border-radius: 0.4rem; color: #166534; font-size: 0.72rem; padding: 0.15rem 0.6rem; }
+.badge-off { background: #f1f5f9; border: 1px solid var(--line); border-radius: 0.4rem; color: var(--muted); font-size: 0.72rem; padding: 0.15rem 0.6rem; }
+.official-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; }
+.official-id { display: flex; flex-direction: column; gap: 0.2rem; }
+.official-id strong { font-size: 1.1rem; }
+.official-id .tag { color: var(--muted); }
+.official-id .meta { color: var(--muted); font-size: 0.8rem; }
+.official-counts { align-items: center; display: flex; flex-wrap: wrap; gap: 1.2rem; }
+.official-counts span { color: var(--muted); font-size: 0.85rem; }
+.official-counts strong { color: var(--ink); font-size: 1.3rem; display: block; }
+.official-empty { color: #b45309; font-weight: 600; }
+.official-note { background: #f1f5f9; border-radius: 0.4rem; color: var(--muted); font-size: 0.8rem; margin: 0.8rem 0 0; padding: 0.6rem 0.8rem; }
+.official-note code { background: #e2e8f0; border-radius: 0.3rem; padding: 0.05rem 0.3rem; }
+
 /* ---------- footer ---------- */
 .data-note { color: var(--muted); font-size: 0.8rem; margin-top: 1.5rem; padding: 0 0.5rem; }
 

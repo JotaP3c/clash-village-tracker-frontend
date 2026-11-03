@@ -6,6 +6,7 @@ import {
   CategoryResponse,
   DashboardResponse,
   HealthResponse,
+  OfficialProfileResponse,
   SnapshotResponse,
   UpgradeResponse
 } from './dashboard.models';
@@ -45,5 +46,9 @@ export class DashboardApiService {
 
   upgrades(): Observable<UpgradeResponse> {
     return this.http.get<UpgradeResponse>(`${this.baseUrl}/api/village/upgrades`);
+  }
+
+  officialProfile(): Observable<OfficialProfileResponse> {
+    return this.http.get<OfficialProfileResponse>(`${this.baseUrl}/api/village/official-profile`);
   }
 }
