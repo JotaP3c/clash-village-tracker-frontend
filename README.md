@@ -26,6 +26,7 @@ A URL da API tem como padrão `http://localhost:8080` e pode ser sobrescrita em 
 - Cartões de etapas restantes, construtores, dias-construtor (limite inferior) e cobertura dos dados.
 - Navegação por categoria com detalhamento das entidades (nível, máximo, `countAtMax`, Sobrecargas).
 - Listas de Sobrecargas e melhorias permanentes pendentes, com duração base/com Passe e marcação de "em andamento" e "duração desconhecida".
+- Painel "Perfil oficial (API Supercell)": mostra a coleta mais recente do `fetch-player` (heróis, tropas, feitiços, equipamentos) quando existe, com aviso de que a API pública não expõe construções/Sobrecargas/filas/timers. Carregado de forma tolerante a falha (não quebra o dashboard).
 
 ## Build e testes / Build and tests
 

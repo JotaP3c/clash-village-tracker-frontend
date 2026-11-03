@@ -129,10 +129,30 @@ function upgradesFixture(): UpgradeResponse {
   };
 }
 
+function officialUnavailable() {
+  return of({
+    available: false,
+    message: 'Nenhuma coleta encontrada.',
+    collectionId: null,
+    requestedTag: null,
+    returnedTag: null,
+    httpStatus: null,
+    outcome: null,
+    collectedAt: null,
+    bodySha256: null,
+    profile: null
+  });
+}
+
 function configureWith(api: Partial<DashboardApiService>) {
+  // Provide a default officialProfile unless the test overrides it, so forkJoin always completes.
+  const withDefaults: Partial<DashboardApiService> = {
+    officialProfile: () => officialUnavailable() as never,
+    ...api
+  };
   TestBed.configureTestingModule({
     imports: [DashboardPage],
-    providers: [{ provide: DashboardApiService, useValue: api }]
+    providers: [{ provide: DashboardApiService, useValue: withDefaults }]
   });
   return TestBed.createComponent(DashboardPage);
 }

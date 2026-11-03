@@ -61,6 +61,10 @@
 | `dashboard-page.spec.ts` | 4 | ✅ |
 | **Total** | **9** | **✅ 3 arquivos, 9 testes, 0 falhas** |
 
+### Atualização 2026-11-03 — painel de perfil oficial (Opção A)
+
+O dashboard passou a carregar também `GET /api/village/official-profile` (via `forkJoin` com `catchError` → uma falha nessa chamada não quebra a página). Os testes do componente foram ajustados para fornecer um `officialProfile()` padrão no serviço mockado; a suíte continua **9/9 verde** e o `ng build` de produção permanece limpo.
+
 ## 7. Resultado do build de produção
 
 `ng build` → **Application bundle generation complete**, sem warnings. Saída em `dist/clash-village-tracker-frontend` (initial total ~272 kB raw / ~74 kB transfer). O budget de estilo por componente foi elevado em `angular.json` para acomodar o SCSS do dashboard.
