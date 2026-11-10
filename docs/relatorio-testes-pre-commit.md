@@ -5,7 +5,7 @@
 ## 1. Data e repositório
 
 - **Data:** 2026-11-03
-- **Repositório:** `C:\Kiro\CoC\clash-village-tracker-frontend` (Angular 21 / Node 22.12.0 / Vitest)
+- **Repositório:** `clash-village-tracker-frontend` (Angular 21 / Node 22.12.0 / Vitest)
 - **Branch:** `main` (ainda sem commits; tudo em staging)
 - **Escopo:** validação pré-commit do dashboard conectado à API real, sem commit/push.
 
